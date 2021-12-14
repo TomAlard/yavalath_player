@@ -1,0 +1,12 @@
+src/board.c
+src/coord.c
+src/heuristics.c
+src/line.c
+src/main.c
+src/minimax.c
+src/random.c
+src/transposition_table.c
+src/util.c
+test/test_board.c
+test/test_main.c
+test/test_minimax.c
