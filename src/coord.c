@@ -4,11 +4,8 @@
 
 
 bool coord_is_valid(Coord coord) {
-    return coord_is_valid_xy(coord.x, coord.y);
-}
-
-
-bool coord_is_valid_xy(int8_t x, int8_t y) {
+    int8_t x = coord.x;
+    int8_t y = coord.y;
     return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE - abs(x-4);
 }
 

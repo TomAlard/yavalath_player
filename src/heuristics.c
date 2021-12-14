@@ -111,6 +111,7 @@ int heuristic_analysis(Board* board, Heuristics* heuristics, Coord last_move, ui
                     return 1000;
                 }
                 Coord forced = line[current_line_index+1 + (pattern[current_line_index+1] != 0)];
+                my_assert(get_id(board, forced) == 0, "heuristic_analysis: forced move has non zero id!");
                 my_assert(forced.x != last_move.x || forced.y != last_move.y,
                           "heuristic_analysis: forced move is last move!");
                 set_coord(forced_move, forced);

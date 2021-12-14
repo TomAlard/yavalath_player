@@ -18,10 +18,17 @@ typedef struct Board {
 } Board;
 
 
+void set_id(Board* board, Coord coord, int8_t id) {
+    board->board[coord.x][coord.y] = id;
+}
+
+
 void init_board_board(Board* board) {
     for (int x = 0; x < BOARD_SIZE; x++) {
         for (int y = 0; y < BOARD_SIZE; y++) {
-            board->board[x][y] = coord_is_valid_xy(x, y)? 0 : -1;
+            Coord c = {x, y};
+            int8_t id = coord_is_valid(c)? 0 : -1;
+            set_id(board, c, id);
         }
     }
 }
@@ -90,20 +97,16 @@ int8_t get_id(Board* board, Coord coord) {
 
 void make_move(Board* board, Coord coord, uint8_t current_id) {
     my_assert(current_id != 0, "make_move: current id is 0!");
-    int8_t x = coord.x;
-    int8_t y = coord.y;
-    board->hash ^= board->hash_keys[x][y][current_id - 1];
-    board->board[x][y] = current_id;
+    board->hash ^= board->hash_keys[coord.x][coord.y][current_id - 1];
+    set_id(board, coord, current_id);
 }
 
 
 void undo_move(Board* board, Coord coord) {
     uint8_t id = get_id(board, coord);
     my_assert(id != 0, "undo_move: undoing move with id 0!");
-    int8_t x = coord.x;
-    int8_t y = coord.y;
-    board->hash ^= board->hash_keys[x][y][id - 1];
-    board->board[x][y] = 0;
+    board->hash ^= board->hash_keys[coord.x][coord.y][id - 1];
+    set_id(board, coord, 0);
 }
 
 

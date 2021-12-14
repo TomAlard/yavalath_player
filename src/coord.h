@@ -13,8 +13,6 @@ typedef struct Coord {
 
 bool coord_is_valid(Coord coord);
 
-bool coord_is_valid_xy(int8_t x, int8_t y);
-
 void set_coord(Coord* target, Coord source);
 
 void set_coord_invalid(Coord* target);
