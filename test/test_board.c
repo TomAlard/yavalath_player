@@ -120,10 +120,16 @@ void test_get_forced_move_in_position() {
 
 
 void run_board_tests() {
+    fprintf(stderr, "test_init_board\n");
     test_init_board();
+    fprintf(stderr, "test_iterate\n");
     test_iterate();
+    fprintf(stderr, "test_get_true_value_of_board\n");
     test_get_true_value_of_board();
+    fprintf(stderr, "test_get_heuristic_value_of_board\n");
     test_get_heuristic_value_of_board();
+    fprintf(stderr, "test_get_id\n");
     test_get_id();
+    fprintf(stderr, "test_get_forced_move_in_position\n");
     test_get_forced_move_in_position();
 }

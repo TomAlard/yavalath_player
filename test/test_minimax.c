@@ -41,5 +41,6 @@ void test_finds_win() {
 
 
 void run_minimax_tests() {
+    fprintf(stderr, "test_finds_win\n");
     test_finds_win();
 }

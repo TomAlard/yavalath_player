@@ -6,16 +6,16 @@
 #include "../test/test_main.h"
 
 
-bool handle_opening(Board* board, uint8_t my_id, Coord enemy_move, int* heuristic_value) {
+bool handle_opening(Board* board, uint8_t my_id, Coord enemy_move, int* heuristic_value, bool print) {
     if (!coord_is_valid(enemy_move)) {
         Coord move = {2, 2};
-        play_move(board, my_id, move, "OPENING", true);
+        play_move(board, my_id, move, "OPENING", print);
         *heuristic_value = -2;
         return true;
     }
     if (get_position_heuristic_of_move(board, enemy_move) >= 2) {
         make_move(board, enemy_move, opposite_id(my_id));
-        play_move(board, my_id, enemy_move, "STEAL", true);
+        play_move(board, my_id, enemy_move, "STEAL", print);
         *heuristic_value = -get_position_heuristic_of_move(board, enemy_move);
         return true;
     }
@@ -23,18 +23,18 @@ bool handle_opening(Board* board, uint8_t my_id, Coord enemy_move, int* heuristi
 }
 
 
-bool handle_forced_move(Board* board, uint8_t my_id, int* heuristic_value) {
+bool handle_forced_move(Board* board, uint8_t my_id, int* heuristic_value, bool print) {
     Coord forced_move = get_forced_move_in_position(board);
     bool is_forced_move = coord_is_valid(forced_move);
     if (is_forced_move) {
-        play_move(board, my_id, forced_move, "FORCED", true);
+        play_move(board, my_id, forced_move, "FORCED", print);
         *heuristic_value = get_heuristic_value_of_board(board, forced_move, *heuristic_value);
     }
     return is_forced_move;
 }
 
 
-bool handle_instant_win(Board* board, uint8_t my_id, int* heuristic_value) {
+bool handle_instant_win(Board* board, uint8_t my_id, int* heuristic_value, bool print) {
     Coord moves[BOARD_SQUARES];
     int amount_of_moves = iterate(board, moves, my_id, *heuristic_value, false);
     for (int i = 0; i < amount_of_moves; i++) {
@@ -43,7 +43,7 @@ bool handle_instant_win(Board* board, uint8_t my_id, int* heuristic_value) {
         int true_value = -get_true_value_of_board(board, move);
         undo_move(board, move);
         if (true_value == WIN) {
-            play_move(board, my_id, move, "INSTANT WIN", true);
+            play_move(board, my_id, move, "INSTANT WIN", print);
             *heuristic_value = WIN;
             return true;
         }
@@ -55,12 +55,12 @@ bool handle_instant_win(Board* board, uint8_t my_id, int* heuristic_value) {
 int play_best_move(Board* board, uint8_t my_id, Coord enemy_move, bool first, int previous_heuristic_value, double time,
                    bool print) {
     int heuristic_value = previous_heuristic_value;
-    if (first && handle_opening(board, my_id, enemy_move, &heuristic_value)) {
+    if (first && handle_opening(board, my_id, enemy_move, &heuristic_value, print)) {
         return heuristic_value;
     }
     make_move(board, enemy_move, opposite_id(my_id));
     heuristic_value = -get_heuristic_value_of_board(board, enemy_move, previous_heuristic_value);
-    if (handle_instant_win(board, my_id, &heuristic_value) || handle_forced_move(board, my_id, &heuristic_value)) {
+    if (handle_instant_win(board, my_id, &heuristic_value, print) || handle_forced_move(board, my_id, &heuristic_value, print)) {
         return heuristic_value;
     }
 
@@ -95,7 +95,7 @@ int play_best_move(Board* board, uint8_t my_id, Coord enemy_move, bool first, in
 
 #define TIME 5
 int main() {
-    // run_tests();
+    run_tests();
     int my_id;
     scanf("%d", &my_id);
     Board* board = init_board();
