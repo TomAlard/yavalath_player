@@ -60,14 +60,14 @@ bool heuristic_value_is_valid(int heuristic_value) {
 
 void add_true_value_to_table(TableEntry* table, Hash hash, int true_value) {
     int index = get_index(hash);
-    table[index].true_value = true_value;
+    table[index].true_value = (short) true_value;
     table[index].key = hash;
 }
 
 
 void add_heuristic_value_to_table(TableEntry* table, Hash hash, int heuristic_value) {
     int index = get_index(hash);
-    table[index].heuristic_value = heuristic_value;
+    table[index].heuristic_value = (short) heuristic_value;
     table[index].key = hash;
 }
 
