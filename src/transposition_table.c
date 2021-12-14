@@ -25,7 +25,7 @@ TableEntry* create_transposition_table() {
 
 
 Hash get_index(Hash hash) {
-    return hash % TRANSPOSITION_TABLE_SIZE;
+    return hash & ((1 << 26) - 1);
 }
 
 
