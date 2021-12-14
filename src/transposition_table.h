@@ -1,7 +1,7 @@
 #ifndef YAVALATHCODINGAMEC_TRANSPOSITION_TABLE_H
 #define YAVALATHCODINGAMEC_TRANSPOSITION_TABLE_H
 
-#include "board.h"
+#include "game.h"
 
 typedef struct TableEntry TableEntry;
 

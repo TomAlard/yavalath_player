@@ -46,11 +46,11 @@ void construct_line_through_coord(Coord coord, uint8_t direction, Coord line[7])
 }
 
 
-uint8_t calculate_line_length(Board* board, Coord start, uint8_t direction) {
-    uint8_t start_id = get_id(board, start);
+uint8_t calculate_line_length(Game* game, Coord start, uint8_t direction) {
+    uint8_t start_id = get_id(game, start);
     Coord current = {start.x, start.y};
     uint8_t result = 0;
-    while (result < 4 && coord_is_valid(current) && get_id(board, current) == start_id) {
+    while (result < 4 && coord_is_valid(current) && get_id(game, current) == start_id) {
         result++;
         current = get_next_in_line(current, direction);
     }

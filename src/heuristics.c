@@ -78,9 +78,9 @@ int find_line_start(Coord line[7]) {
 }
 
 
-void fill_pattern_ids(Board* board, int8_t pattern[7], Coord line[7], int line_start) {
+void fill_pattern_ids(Game* game, int8_t pattern[7], Coord line[7], int line_start) {
     for (int i = line_start; i < 7 && coord_is_valid(line[i]); i++) {
-        pattern[i] = get_id(board, line[i]);
+        pattern[i] = get_id(game, line[i]);
     }
 }
 
@@ -95,14 +95,14 @@ int get_erased_pattern_value(Heuristics* heuristics, int8_t pattern[7], int star
 
 
 #define INVALID_LINE7 {INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD}
-int heuristic_analysis(Board* board, Heuristics* heuristics, Coord last_move, uint8_t current_id, Coord* forced_move) {
+int heuristic_analysis(Game* game, Heuristics* heuristics, Coord last_move, uint8_t current_id, Coord* forced_move) {
     int result = get_position_heuristic(heuristics, last_move);
     for (int direction = 0; direction < 3; direction++) {
         Coord line[7] = INVALID_LINE7;
         construct_line_through_coord(last_move, direction, line);
         int current_line_index = find_line_start(line);
         int8_t pattern[7] = {-1, -1, -1, -1, -1, -1, -1};
-        fill_pattern_ids(board, pattern, line, current_line_index);
+        fill_pattern_ids(game, pattern, line, current_line_index);
 
         while (current_line_index < 4) {
             int value = get_pattern_value(heuristics, pattern, current_line_index, current_id);
@@ -111,7 +111,7 @@ int heuristic_analysis(Board* board, Heuristics* heuristics, Coord last_move, ui
                     return 1000;
                 }
                 Coord forced = line[current_line_index+1 + (pattern[current_line_index+1] != 0)];
-                my_assert(get_id(board, forced) == 0, "heuristic_analysis: forced move has non zero id!");
+                my_assert(get_id(game, forced) == 0, "heuristic_analysis: forced move has non zero id!");
                 my_assert(forced.x != last_move.x || forced.y != last_move.y,
                           "heuristic_analysis: forced move is last move!");
                 set_coord(forced_move, forced);

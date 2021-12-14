@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "coord.h"
-#include "board.h"
+#include "game.h"
 
 
 bool coord_is_valid(Coord coord) {
