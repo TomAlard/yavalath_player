@@ -42,7 +42,8 @@ int alphabeta(Game* game, State state, clock_t deadline, Coord* best_move) {
     }
 
     int previous_heuristic_value = state.heuristic_value;
-    my_assert(previous_heuristic_value != WIN && previous_heuristic_value != LOSS, "Alphabeta previous heuristic value is WIN/LOSS");
+    my_assert(previous_heuristic_value != WIN && previous_heuristic_value != LOSS,
+              "Alphabeta previous heuristic value is WIN/LOSS");
     int best_minimax_value = -INF;
     Coord moves[BOARD_SQUARES];
     bool is_max_depth = state.current_depth == state.max_depth;
@@ -104,8 +105,9 @@ int evaluate_move(Game* game, State state, Coord forced_move, clock_t deadline, 
 }
 
 
-int calculate_minimax_value(Game* game, Coord last_move, int max_depth, clock_t deadline, int heuristic_value, Coord* best_move) {
-    uint8_t current_id = opposite_id(get_id(game, last_move));
+int calculate_minimax_value(Game* game, Coord last_move, int max_depth, clock_t deadline, int heuristic_value,
+                            Coord* best_move) {
+    uint8_t current_id = opposite_id(get_id_of_move(game, last_move));
     State state = {last_move, current_id, max_depth, max_depth, LOSS, WIN, heuristic_value};
     return alphabeta(game, state, deadline, best_move);
 }

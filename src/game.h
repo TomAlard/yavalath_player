@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "coord.h"
+#include "board.h"
 
 #define BOARD_SIZE 9
 #define BOARD_SQUARES 61
@@ -20,7 +21,9 @@ void free_game(Game* game);
 
 int init_position(Game* game, char* filename);
 
-int8_t get_id(Game* game, Coord coord);
+Board* get_board(Game* game);
+
+int8_t get_id_of_move(Game* game, Coord coord);
 
 void make_move(Game* game, Coord coord, uint8_t current_id);
 

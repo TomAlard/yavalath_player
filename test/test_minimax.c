@@ -7,7 +7,7 @@
 
 uint8_t play_game(Game* game, Coord first_move) {
     int true_value = 0;
-    uint8_t current_id = opposite_id(get_id(game, first_move));
+    uint8_t current_id = opposite_id(get_id_of_move(game, first_move));
     Coord last_move = first_move;
     while (true_value == 0) {
         play_best_move(game, current_id, last_move, false, 0, INF, false);

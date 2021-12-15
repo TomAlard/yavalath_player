@@ -9,7 +9,7 @@ void test_init_game() {
         for (int y = 0; y < BOARD_SIZE; y++) {
             Coord coord = {x, y};
             int expected_id = coord_is_valid(coord)? 0 : -1;
-            my_assert(get_id(game, coord) == expected_id, "test_init_game: Incorrectly initialized id's");
+            my_assert(get_id_of_move(game, coord) == expected_id, "test_init_game: Incorrectly initialized id's");
         }
     }
     free_game(game);
@@ -96,7 +96,7 @@ void test_get_id() {
             if (coord_is_valid(move)) {
                 for (int id = 1; id <= 2; id++) {
                     make_move(game, move, id);
-                    my_assert(get_id(game, move) == id, fail_msg);
+                    my_assert(get_id_of_move(game, move) == id, fail_msg);
                     undo_move(game, move);
                 }
             }

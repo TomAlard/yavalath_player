@@ -4,34 +4,17 @@
 #include "random.h"
 #include "game.h"
 #include "util.h"
-#include "line.h"
 #include "heuristics.h"
 #include "transposition_table.h"
 
 
 typedef struct Game {
-    int8_t game[BOARD_SIZE][BOARD_SIZE];
+    Board* board;
     Hash hash_keys[BOARD_SIZE][BOARD_SIZE][2];
     Hash hash;
     Heuristics* heuristics;
     TableEntry* transposition_table;
 } Game;
-
-
-void set_id(Game* game, Coord coord, int8_t id) {
-    game->game[coord.x][coord.y] = id;
-}
-
-
-void init_game_game(Game* game) {
-    for (int x = 0; x < BOARD_SIZE; x++) {
-        for (int y = 0; y < BOARD_SIZE; y++) {
-            Coord c = {x, y};
-            int8_t id = coord_is_valid(c)? 0 : -1;
-            set_id(game, c, id);
-        }
-    }
-}
 
 
 void init_game_hash_keys(Game* game) {
@@ -49,9 +32,9 @@ void init_game_hash_keys(Game* game) {
 
 Game* init_game() {
     Game* game = safe_malloc(sizeof(Game));
+    game->board = init_board();
     game->transposition_table = create_transposition_table();
     game->heuristics = create_heuristics();
-    init_game_game(game);
     init_game_hash_keys(game);
     game->hash = 0;
     return game;
@@ -59,6 +42,7 @@ Game* init_game() {
 
 
 void free_game(Game* game) {
+    free(game->board);
     free(game->transposition_table);
     free(game->heuristics);
     free(game);
@@ -90,23 +74,28 @@ int init_position(Game* game, char* filename) {
 }
 
 
-int8_t get_id(Game* game, Coord coord) {
-    return game->game[coord.x][coord.y];
+Board* get_board(Game* game) {
+    return game->board;
+}
+
+
+int8_t get_id_of_move(Game* game, Coord coord) {
+    return get_id(game->board, coord);
 }
 
 
 void make_move(Game* game, Coord coord, uint8_t current_id) {
     my_assert(current_id != 0, "make_move: current id is 0!");
     game->hash ^= game->hash_keys[coord.x][coord.y][current_id - 1];
-    set_id(game, coord, current_id);
+    set_id(game->board, coord, current_id);
 }
 
 
 void undo_move(Game* game, Coord coord) {
-    uint8_t id = get_id(game, coord);
+    uint8_t id = get_id_of_move(game, coord);
     my_assert(id != 0, "undo_move: undoing move with id 0!");
     game->hash ^= game->hash_keys[coord.x][coord.y][id - 1];
-    set_id(game, coord, 0);
+    set_id(game->board, coord, 0);
 }
 
 
@@ -129,7 +118,7 @@ int iterate(Game* game, Coord moves[BOARD_SQUARES], uint8_t current_id, int heur
     for (int x = 0; x < BOARD_SIZE; x++) {
         for (int y = 0; y < BOARD_SIZE; y++) {
             Coord c = {x, y};
-            if (get_id(game, c) == 0) {
+            if (get_id_of_move(game, c) == 0) {
                 set_coord(&moves[amount_of_moves++], c);
             }
         }
@@ -148,8 +137,8 @@ int iterate(Game* game, Coord moves[BOARD_SQUARES], uint8_t current_id, int heur
 int score_game(Game* game, Coord last_move) {
     bool line3_found = false;
     for (int direction = 0; direction < 3; direction++) {
-        int line_length = calculate_line_length(game, last_move, direction)
-                          + calculate_line_length(game, last_move, opposite_direction(direction)) - 1;
+        int line_length = calculate_line_length(game->board, last_move, direction)
+                          + calculate_line_length(game->board, last_move, opposite_direction(direction)) - 1;
         if (line_length == 4) {
             return LOSS;
         }
@@ -162,7 +151,7 @@ int score_game(Game* game, Coord last_move) {
 
 
 int get_true_value_of_game(Game* game, Coord last_move) {
-    my_assert(get_id(game, last_move) != 0, "get_true_value_of_game: id is 0!");
+    my_assert(get_id_of_move(game, last_move) != 0, "get_true_value_of_game: id is 0!");
     int table_true_value = get_true_value_from_table(game->transposition_table, game->hash);
     if (true_value_is_valid(table_true_value)) {
         return table_true_value;
@@ -181,14 +170,15 @@ int get_heuristic_value_of_game(Game* game, Coord last_move, int current_heurist
     }
 
     Coord forced_move = INVALID_COORD;
-    uint8_t current_id = get_id(game, last_move);
+    uint8_t current_id = get_id_of_move(game, last_move);
     int added_heuristic_value = heuristic_analysis(game, game->heuristics, last_move, current_id, &forced_move);
     int heuristic_value = added_heuristic_value == 1000
             ? added_heuristic_value
             : current_heuristic_value + added_heuristic_value;
 
     add_heuristic_value_to_table(game->transposition_table, game->hash, heuristic_value);
-    my_assert(get_id(game, forced_move) == 0, "get_heuristic_value_of_game: Forced move has non zero id!");
+    my_assert(!coord_is_valid(forced_move) || get_id_of_move(game, forced_move) == 0,
+              "get_heuristic_value_of_game: Forced move has non zero id!");
     add_forced_move_to_table(game->transposition_table, game->hash, forced_move);
     return heuristic_value;
 }
@@ -196,7 +186,8 @@ int get_heuristic_value_of_game(Game* game, Coord last_move, int current_heurist
 
 Coord get_forced_move_in_position(Game* game) {
     Coord move = get_forced_move_from_table(game->transposition_table, game->hash);
-    my_assert(get_id(game, move) == 0, "get_forced_move_in_position: Forced move has non zero id!");
+    my_assert(!coord_is_valid(move) || get_id_of_move(game, move) == 0,
+              "get_forced_move_in_position: Forced move has non zero id!");
     return move;
 }
 

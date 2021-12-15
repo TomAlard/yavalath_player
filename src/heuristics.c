@@ -1,7 +1,6 @@
 #include <string.h>
 #include "heuristics.h"
 #include "util.h"
-#include "line.h"
 
 
 typedef struct Heuristics {
@@ -69,19 +68,12 @@ int get_pattern_value(Heuristics* heuristics, const int8_t pattern[7], int start
 }
 
 
-int find_line_start(Coord line[7]) {
+int find_pattern_start(const int8_t pattern[7]) {
     int line_start = 0;
-    while (!coord_is_valid(line[line_start])) {
+    while (pattern[line_start] == -1) {
         line_start++;
     }
     return line_start;
-}
-
-
-void fill_pattern_ids(Game* game, int8_t pattern[7], Coord line[7], int line_start) {
-    for (int i = line_start; i < 7 && coord_is_valid(line[i]); i++) {
-        pattern[i] = get_id(game, line[i]);
-    }
 }
 
 
@@ -94,33 +86,30 @@ int get_erased_pattern_value(Heuristics* heuristics, int8_t pattern[7], int star
 }
 
 
-#define INVALID_LINE7 {INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD, INVALID_COORD}
 int heuristic_analysis(Game* game, Heuristics* heuristics, Coord last_move, uint8_t current_id, Coord* forced_move) {
+    Board* board = get_board(game);
     int result = get_position_heuristic(heuristics, last_move);
     for (int direction = 0; direction < 3; direction++) {
-        Coord line[7] = INVALID_LINE7;
-        construct_line_through_coord(last_move, direction, line);
-        int current_line_index = find_line_start(line);
         int8_t pattern[7] = {-1, -1, -1, -1, -1, -1, -1};
-        fill_pattern_ids(game, pattern, line, current_line_index);
-
-        while (current_line_index < 4) {
-            int value = get_pattern_value(heuristics, pattern, current_line_index, current_id);
+        fill_pattern(board, last_move, direction, pattern);
+        int current_pattern_index = find_pattern_start(pattern);
+        while (current_pattern_index < 4) {
+            int value = get_pattern_value(heuristics, pattern, current_pattern_index, current_id);
             if (value == FORCED_MOVE_VALUE) {
                 if (coord_is_valid(*forced_move)) {
                     return 1000;
                 }
-                Coord forced = line[current_line_index+1 + (pattern[current_line_index+1] != 0)];
-                my_assert(get_id(game, forced) == 0, "heuristic_analysis: forced move has non zero id!");
+                Coord forced = get_forced_move_from_pattern(board, pattern, last_move, current_pattern_index, direction);
+                my_assert(get_id_of_move(game, forced) == 0, "heuristic_analysis: forced move has non zero id!");
                 my_assert(forced.x != last_move.x || forced.y != last_move.y,
                           "heuristic_analysis: forced move is last move!");
                 set_coord(forced_move, forced);
             }
             result += value;
-            int erased = get_erased_pattern_value(heuristics, pattern, current_line_index, current_id);
+            int erased = get_erased_pattern_value(heuristics, pattern, current_pattern_index, current_id);
             my_assert(erased != WIN && erased != LOSS, "heuristic_analysis erased is WIN/LOSS");
             result -= erased;
-            current_line_index++;
+            current_pattern_index++;
         }
     }
     return result;
