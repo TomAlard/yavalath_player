@@ -31,6 +31,12 @@ void set_position_heuristic(Heuristics* heuristic) {
 // From Player 1's perspective
 void set_patterns_heuristic(Heuristics* heuristic) {
     int h[81] = {0};
+    h[40] = WIN;  // 1111
+    h[80] = LOSS;  // 2222
+    h[39] = LOSS;  // 1110
+    h[78] = WIN;  // 2220
+    h[41] = LOSS;  // 1112
+    h[79] = WIN;  // 2221
     h[37] = FORCED_MOVE_VALUE;  // 1101
     h[74] = -FORCED_MOVE_VALUE;  // 2202
     h[31] = FORCED_MOVE_VALUE;  // 1011
@@ -95,6 +101,9 @@ int heuristic_analysis(Game* game, Heuristics* heuristics, Coord last_move, uint
         int current_pattern_index = find_pattern_start(pattern);
         while (current_pattern_index < 4) {
             int value = get_pattern_value(heuristics, pattern, current_pattern_index, current_id);
+            if (value == WIN || value == LOSS) {
+                return value;
+            }
             if (value == FORCED_MOVE_VALUE) {
                 if (coord_is_valid(*forced_move)) {
                     return 1000;

@@ -172,9 +172,7 @@ int get_heuristic_value_of_game(Game* game, Coord last_move, int current_heurist
     Coord forced_move = INVALID_COORD;
     uint8_t current_id = get_id_of_move(game, last_move);
     int added_heuristic_value = heuristic_analysis(game, game->heuristics, last_move, current_id, &forced_move);
-    int heuristic_value = added_heuristic_value == 1000
-            ? added_heuristic_value
-            : current_heuristic_value + added_heuristic_value;
+    int heuristic_value = current_heuristic_value + added_heuristic_value;
 
     add_heuristic_value_to_table(game->transposition_table, game->hash, heuristic_value);
     my_assert(!coord_is_valid(forced_move) || get_id_of_move(game, forced_move) == 0,
