@@ -58,8 +58,18 @@ bool heuristic_value_is_valid(int heuristic_value) {
 }
 
 
+void clear_entry_if_different_hash(TableEntry* table, Hash hash, int index) {
+    if (table[index].key != hash) {
+        set_coord_invalid(&table[index].forced_move);
+        table[index].heuristic_value = INF;
+        table[index].true_value = -1;
+    }
+}
+
+
 void add_true_value_to_table(TableEntry* table, Hash hash, int true_value) {
     int index = get_index(hash);
+    clear_entry_if_different_hash(table, hash, index);
     table[index].true_value = (short) true_value;
     table[index].key = hash;
 }
@@ -67,6 +77,7 @@ void add_true_value_to_table(TableEntry* table, Hash hash, int true_value) {
 
 void add_heuristic_value_to_table(TableEntry* table, Hash hash, int heuristic_value) {
     int index = get_index(hash);
+    clear_entry_if_different_hash(table, hash, index);
     table[index].heuristic_value = (short) heuristic_value;
     table[index].key = hash;
 }
@@ -74,6 +85,7 @@ void add_heuristic_value_to_table(TableEntry* table, Hash hash, int heuristic_va
 
 void add_forced_move_to_table(TableEntry* table, Hash hash, Coord forced_move) {
     int index = get_index(hash);
+    clear_entry_if_different_hash(table, hash, index);
     table[index].forced_move = forced_move;
     table[index].key = hash;
 }
