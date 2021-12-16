@@ -24,6 +24,8 @@ clock_t get_deadline(double time);
 
 bool has_time_remaining(clock_t deadline);
 
+bool value_is_win_loss(int value);
+
 void my_assert(bool condition, char* msg);
 
 #endif //YAVALATHCODINGAMEC_UTIL_H

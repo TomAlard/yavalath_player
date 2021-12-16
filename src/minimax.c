@@ -33,8 +33,9 @@ int alphabeta(Game* game, State state, clock_t deadline, Coord* best_move) {
     if (!has_time_remaining(deadline)) {
         return 0;
     }
+    bool is_max_depth = state.current_depth == state.max_depth;
     int true_value = get_true_value_of_game(game, state.last_move);
-    if (true_value != 0) {
+    if (true_value != 0 && !is_max_depth) {
         return true_value;
     }
     if (state.current_depth == 0) {
@@ -46,7 +47,7 @@ int alphabeta(Game* game, State state, clock_t deadline, Coord* best_move) {
               "Alphabeta previous heuristic value is WIN/LOSS");
     int best_minimax_value = -INF;
     Coord moves[BOARD_SQUARES];
-    bool is_max_depth = state.current_depth == state.max_depth;
+
     int amount_of_moves = iterate(game, moves, state.current_id, previous_heuristic_value, is_max_depth);
     for (int i = 0; i < amount_of_moves; i++) {
         Coord move = moves[i];
@@ -72,6 +73,7 @@ int alphabeta(Game* game, State state, clock_t deadline, Coord* best_move) {
             break;
         }
     }
+    add_minimax_value_of_position(game, best_minimax_value);
     return best_minimax_value;
 }
 

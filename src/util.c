@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "util.h"
+#include "game.h"
 
 
 void* safe_malloc(size_t size) {
@@ -57,6 +58,11 @@ clock_t get_deadline(double time) {
 
 bool has_time_remaining(clock_t deadline) {
     return clock() < deadline;
+}
+
+
+bool value_is_win_loss(int value) {
+    return value == WIN || value == LOSS;
 }
 
 

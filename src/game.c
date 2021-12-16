@@ -202,6 +202,13 @@ Coord get_book_move_in_position(Game* game) {
 }
 
 
+void add_minimax_value_of_position(Game* game, int value) {
+    if (value_is_win_loss(value)) {
+        add_true_value_to_table(game->transposition_table, game->hash, value);
+    }
+}
+
+
 void play_move(Game* game, uint8_t my_id, Coord move, char* message, bool print) {
     make_move(game, move, my_id);
     if (print) {
