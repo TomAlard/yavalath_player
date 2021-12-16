@@ -6,6 +6,7 @@
 #include "util.h"
 #include "heuristics.h"
 #include "transposition_table.h"
+#include "opening_book.h"
 
 
 typedef struct Game {
@@ -34,6 +35,7 @@ Game* init_game() {
     Game* game = safe_malloc(sizeof(Game));
     game->board = init_board();
     game->transposition_table = create_transposition_table();
+    add_book_moves_to_table(game->transposition_table);
     game->heuristics = create_heuristics();
     init_game_hash_keys(game);
     game->hash = 0;
@@ -192,6 +194,11 @@ Coord get_forced_move_in_position(Game* game) {
 
 int get_position_heuristic_of_move(Game* game, Coord move) {
     return get_position_heuristic(game->heuristics, move);
+}
+
+
+Coord get_book_move_in_position(Game* game) {
+    return get_book_move_from_table(game->transposition_table, game->hash);
 }
 
 

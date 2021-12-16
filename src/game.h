@@ -39,6 +39,8 @@ Coord get_forced_move_in_position(Game* game);
 
 int get_position_heuristic_of_move(Game* game, Coord move);
 
+Coord get_book_move_in_position(Game* game);
+
 void play_move(Game* game, uint8_t my_id, Coord move, char* message, bool print);
 
 #endif //YAVALATHCODINGAMEC_GAME_H

@@ -9,13 +9,13 @@
 bool handle_opening(Game* game, uint8_t my_id, Coord enemy_move, int* heuristic_value, bool print) {
     if (!coord_is_valid(enemy_move)) {
         Coord move = {2, 2};
-        play_move(game, my_id, move, "OPENING", print);
+        play_move(game, my_id, move, "BOOK", print);
         *heuristic_value = -2;
         return true;
     }
     if (get_position_heuristic_of_move(game, enemy_move) >= 2) {
         make_move(game, enemy_move, opposite_id(my_id));
-        play_move(game, my_id, enemy_move, "STEAL", print);
+        play_move(game, my_id, enemy_move, "BOOK", print);
         *heuristic_value = -get_position_heuristic_of_move(game, enemy_move);
         return true;
     }
@@ -59,6 +59,11 @@ int play_best_move(Game* game, uint8_t my_id, Coord enemy_move, bool first, int 
         return heuristic_value;
     }
     make_move(game, enemy_move, opposite_id(my_id));
+    Coord book_move = get_book_move_in_position(game);
+    if (coord_is_valid(book_move)) {
+        play_move(game, my_id, book_move, "BOOK", print);
+        return -get_position_heuristic_of_move(game, enemy_move);
+    }
     heuristic_value = -get_heuristic_value_of_game(game, enemy_move, previous_heuristic_value);
     if (handle_instant_win(game, my_id, &heuristic_value, print) || handle_forced_move(game, my_id, &heuristic_value, print)) {
         return heuristic_value;
@@ -95,7 +100,7 @@ int play_best_move(Game* game, uint8_t my_id, Coord enemy_move, bool first, int 
 
 #define TIME 5
 int main() {
-    run_tests();
+    // run_tests();
     int my_id;
     scanf("%d", &my_id);
     Game* game = init_game();
