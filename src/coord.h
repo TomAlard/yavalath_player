@@ -19,4 +19,6 @@ void set_coord_invalid(Coord* target);
 
 bool coord_equals_xy(Coord c, int8_t x, int8_t y);
 
+bool coord_equals(Coord c1, Coord c2);
+
 #endif //YAVALATHCODINGAMEC_COORD_H

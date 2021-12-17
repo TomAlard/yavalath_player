@@ -25,3 +25,8 @@ void set_coord_invalid(Coord* target) {
 bool coord_equals_xy(Coord c, int8_t x, int8_t y) {
     return c.x == x && c.y == y;
 }
+
+
+bool coord_equals(Coord c1, Coord c2) {
+    return coord_equals_xy(c1, c2.x, c2.y);
+}
