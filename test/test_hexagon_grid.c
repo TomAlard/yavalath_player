@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "test_rotation.h"
+#include "test_hexagon_grid.h"
 #include "../src/coord.h"
-#include "../src/rotation.h"
+#include "../src/hexagon_grid.h"
 #include "../src/util.h"
 
 
@@ -55,9 +55,45 @@ void test_rotate_coord_counter_clockwise() {
 }
 
 
+void test_coord_neighbor() {
+    CoordPair test_cases_direction0[] = {
+            {{0, 0}, {0, 1}},
+            {{4, 4}, {4, 5}},
+            {{7, 2}, {7, 3}}
+    };
+    CoordPair test_cases_direction1[] = {
+            {{0, 0}, {1, 1}},
+            {{4, 4}, {5, 4}},
+            {{7, 2}, {8, 2}}
+    };
+    CoordPair test_cases_direction2[] = {
+            {{1, 1}, {0, 1}},
+            {{4, 4}, {3, 4}},
+            {{7, 2}, {6, 3}}
+    };
+
+    char* fail_msg = "test_coord_neighbor: Result is not expected coord";
+    for (int direction = 0; direction < 3; direction++) {
+        CoordPair* test_cases = direction == 0? test_cases_direction0
+                                : direction == 1? test_cases_direction1
+                                : test_cases_direction2;
+        int amount_of_test_cases = 3;
+        for (int i = 0; i < amount_of_test_cases; i++) {
+            CoordPair pair = test_cases[i];
+            Coord neighbor = coord_neighbor(pair.given, direction, false);
+            my_assert(coord_equals(neighbor, pair.expected), fail_msg);
+            Coord reverse_neighbor = coord_neighbor(pair.expected, direction, true);
+            my_assert(coord_equals(reverse_neighbor, pair.given), fail_msg);
+        }
+    }
+}
+
+
 void run_rotation_tests() {
     fprintf(stderr, "test_rotate_coord_clockwise\n");
     test_rotate_coord_clockwise();
     fprintf(stderr, "test_rotate_coord_counter_clockwise\n");
     test_rotate_coord_counter_clockwise();
+    fprintf(stderr, "test_coord_neighbor\n");
+    test_coord_neighbor();
 }

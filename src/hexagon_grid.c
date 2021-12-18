@@ -1,4 +1,4 @@
-#include "rotation.h"
+#include "hexagon_grid.h"
 #include "board.h"
 
 
@@ -82,7 +82,7 @@ CubeCoord coord_to_cube(Coord coord) {
             {-1, 4, -3},
             {0, 4, -4}
     };
-    return conversion_table[(BOARD_SQUARES - 1) - get_coord_index(coord)];
+    return conversion_table[(BOARD_SQUARES - 1) - coord_to_index(coord)];
 }
 
 
@@ -103,4 +103,18 @@ Coord rotate_coord_counter_clockwise(Coord coord) {
     CubeCoord cube = coord_to_cube(coord);
     CubeCoord rotated_cube = {-cube.s, -cube.q, -cube.r};
     return cube_to_coord(rotated_cube);
+}
+
+
+CubeCoord add_cubes(CubeCoord c1, CubeCoord c2) {
+    CubeCoord result = {c1.q + c2.q, c1.r + c2.r, c1.s + c2.s};
+    return result;
+}
+
+
+Coord coord_neighbor(Coord coord, uint8_t direction, bool reverse) {
+    CubeCoord cube = coord_to_cube(coord);
+    const CubeCoord cube_offsets[] = {{1, 0, -1}, {0, 1, -1}, {1, -1, 0}, {-1, 0, 1}, {0, -1, 1}, {-1, 1, 0}};
+    CubeCoord cube_neighbor = add_cubes(cube, cube_offsets[direction + 3*reverse]);
+    return cube_to_coord(cube_neighbor);
 }
