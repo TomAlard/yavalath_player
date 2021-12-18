@@ -1,12 +1,15 @@
 src/board.c
 src/coord.c
 src/game.c
-src/heuristics.c
+src/hexagon_grid.c
 src/main.c
 src/minimax.c
+src/opening_book.c
 src/random.c
 src/transposition_table.c
 src/util.c
+test/test_board.c
 test/test_game.c
+test/test_hexagon_grid.c
 test/test_main.c
 test/test_minimax.c
