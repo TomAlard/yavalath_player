@@ -67,9 +67,9 @@ void test_coord_neighbor() {
             {{7, 2}, {8, 2}}
     };
     CoordPair test_cases_direction2[] = {
-            {{1, 1}, {0, 1}},
-            {{4, 4}, {3, 4}},
-            {{7, 2}, {6, 3}}
+            {{1, 1}, {2, 1}},
+            {{4, 4}, {5, 3}},
+            {{7, 2}, {8, 1}}
     };
 
     char* fail_msg = "test_coord_neighbor: Result is not expected coord";

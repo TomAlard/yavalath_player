@@ -114,7 +114,7 @@ CubeCoord add_cubes(CubeCoord c1, CubeCoord c2) {
 
 Coord coord_neighbor(Coord coord, uint8_t direction, bool reverse) {
     CubeCoord cube = coord_to_cube(coord);
-    const CubeCoord cube_offsets[] = {{1, 0, -1}, {0, 1, -1}, {1, -1, 0}, {-1, 0, 1}, {0, -1, 1}, {-1, 1, 0}};
+    const CubeCoord cube_offsets[] = {{1, 0, -1}, {0, 1, -1}, {-1, 1, 0}, {-1, 0, 1}, {0, -1, 1}, {1, -1, 0}};
     CubeCoord cube_neighbor = add_cubes(cube, cube_offsets[direction + 3*reverse]);
     return cube_to_coord(cube_neighbor);
 }
