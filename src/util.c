@@ -34,8 +34,13 @@ int max_(int a, int b) {
 }
 
 
-int clip(int a, int min_value, int max_value) {
-    return max_(min_(a, max_value), min_value);
+int sign(int a) {
+    if (a < 0) {
+        return -1;
+    } if (a > 0) {
+        return 1;
+    }
+    return 0;
 }
 
 

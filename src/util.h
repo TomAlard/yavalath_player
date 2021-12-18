@@ -16,7 +16,7 @@ int min_(int a, int b);
 
 int max_(int a, int b);
 
-int clip(int a, int min_value, int max_value);
+int sign(int a);
 
 uint8_t opposite_id(uint8_t id);
 
