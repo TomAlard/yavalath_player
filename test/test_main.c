@@ -2,7 +2,7 @@
 #include "test_main.h"
 #include "test_game.h"
 #include "test_minimax.h"
-#include "test_rotation.h"
+#include "test_hexagon_grid.h"
 
 
 void run_tests() {
