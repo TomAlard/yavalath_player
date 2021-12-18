@@ -66,6 +66,26 @@ bool value_is_win_loss(int value) {
 }
 
 
+uint64_t set_bit(uint64_t number, int index) {
+    return number | (1ULL << index);
+}
+
+
+uint64_t clear_bit(uint64_t number, int index) {
+    return number & (~(1ULL << index));
+}
+
+
+bool bit_at_index(uint64_t number, int index) {
+    return (number >> index) & 1ULL;
+}
+
+
+uint64_t change_bit_to(uint64_t number, int bit_index, uint8_t bit_value) {
+    return number ^ ((-bit_value ^ number) & (1ULL << bit_index));
+}
+
+
 void my_assert(bool condition, char* msg) {
     if (!condition) {
         fprintf(stderr, "Assertion failed: %s\n", msg);
