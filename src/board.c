@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include "board.h"
+#include "game.h"
 #include "util.h"
 #include "hexagon_grid.h"
 
@@ -22,6 +24,7 @@ typedef struct Board {
     uint64_t forcing_move_masks[2][3][BOARD_SQUARES];
     uint64_t great_move_masks[3][BOARD_SQUARES];
     uint64_t bad_move_masks[5][3][BOARD_SQUARES];
+    uint8_t position_heuristic[BOARD_SQUARES];
 } Board;
 
 
@@ -111,6 +114,22 @@ void fill_patterns(uint64_t masks[3][BOARD_SQUARES], uint8_t value, int pattern_
 }
 
 
+void set_position_heuristic(Board* board) {
+    uint8_t position_heuristic[BOARD_SQUARES] = {
+            0, 0, 0, 0, 0,
+            0, 1, 1, 1, 1, 0,
+            0, 1, 2, 2, 2, 1, 0,
+            0, 1, 2, 3, 3, 2, 1, 0,
+            0, 1, 2, 3, 4, 3, 2, 1, 0,
+            0, 1, 2, 3, 3, 2, 1, 0,
+            0, 1, 2, 2, 2, 1, 0,
+            0, 1, 1, 1, 1, 0,
+            0, 0, 0, 0, 0,
+    };
+    memcpy(board->position_heuristic, position_heuristic, sizeof(board->position_heuristic));
+}
+
+
 Board* init_board() {
     Board* board = safe_malloc(sizeof(Board));
     board->player1 = 0;
@@ -125,6 +144,7 @@ Board* init_board() {
     fill_patterns(board->bad_move_masks[3], 12, 4);  // 1100
     fill_patterns(board->bad_move_masks[4], 3, 4);  // 0011
     fill_patterns(board->losing_masks, 7, 3);  // 111
+    set_position_heuristic(board);
     return board;
 }
 
@@ -157,6 +177,13 @@ bool mask_matches(BitBoard bit_board, uint64_t mask) {
 }
 
 
+bool mask_matches_heuristic(Board* board, BitBoard bit_board, BitBoard both_players,Direction direction, uint64_t mask,
+                            int index) {
+    uint64_t select_all_mask = board->winning_masks[direction][index];
+    return ((bit_board & select_all_mask) == mask) && ((both_players & select_all_mask) == mask);
+}
+
+
 int calculate_true_value(Board* board, Coord last_move) {
     int index = coord_to_index(last_move);
     uint8_t id = get_id(board, last_move);
@@ -181,22 +208,31 @@ int calculate_true_value(Board* board, Coord last_move) {
 }
 
 
-int calculate_heuristic_value_at_index(Board* board, BitBoard bit_board, BitBoard both_players, Direction direction, int current_index) {
+int calculate_heuristic_value_at_index(Board* board, BitBoard bit_board, BitBoard both_players, Direction direction,
+                                       int index, Coord* forced_move) {
     for (int j = 0; j < 2; j++) {
-        uint64_t forcing_move_mask = board->forcing_move_masks[j][direction][current_index];
-        if (mask_matches(bit_board, forcing_move_mask) && mask_matches(both_players, forcing_move_mask)) {
+        uint64_t forcing_move_mask = board->forcing_move_masks[j][direction][index];
+        if (mask_matches_heuristic(board, bit_board, both_players, direction, forcing_move_mask, index)) {
+            if (coord_is_valid(*forced_move)) {
+                return DOUBLE_FORCING;
+            }
+            if (j == 0) {
+                *forced_move = index_to_coord(prev_index(index, direction));
+            } else {
+                *forced_move = index_to_coord(prev_index(prev_index(index, direction), direction));
+            }
             return FORCING;
         }
     }
 
-    uint64_t great_move_mask = board->great_move_masks[direction][current_index];
-    if (mask_matches(bit_board, great_move_mask) && mask_matches(both_players, great_move_mask)) {
+    uint64_t great_move_mask = board->great_move_masks[direction][index];
+    if (mask_matches_heuristic(board, bit_board, both_players, direction, great_move_mask, index)) {
         return GREAT;
     }
 
     for (int j = 0; j < 5; j++) {
-        uint64_t bad_move_mask = board->bad_move_masks[j][direction][current_index];
-        if (mask_matches(bit_board, bad_move_mask) && mask_matches(both_players, bad_move_mask)) {
+        uint64_t bad_move_mask = board->bad_move_masks[j][direction][index];
+        if (mask_matches_heuristic(board, bit_board, both_players, direction, bad_move_mask, index)) {
             return BAD;
         }
     }
@@ -204,19 +240,25 @@ int calculate_heuristic_value_at_index(Board* board, BitBoard bit_board, BitBoar
 }
 
 
-int calculate_heuristic_value(Board* board, Coord last_move) {
+int calculate_heuristic_value(Board* board, Coord last_move, Coord* forced_move) {
     int index = coord_to_index(last_move);
     uint8_t id = get_id(board, last_move);
     BitBoard bit_board = id == 1? board->player1 : board->player2;
     BitBoard both_players = board->player1 | board->player2;
 
-    int result = 0;
+    int result = board->position_heuristic[index];
     for (int direction = 0; direction < 3; direction++) {
         int current_index = index;
         for (int i = 0; i < 4 && current_index != -1; i++) {
-            result += calculate_heuristic_value_at_index(board, bit_board, both_players, direction, current_index);
+            result += calculate_heuristic_value_at_index(board, bit_board, both_players, direction, current_index,
+                                                         forced_move);
             current_index = next_index(current_index, direction);
         }
     }
     return result;
+}
+
+
+uint8_t position_heuristic(Board* board, Coord move) {
+    return board->position_heuristic[coord_to_index(move)];
 }

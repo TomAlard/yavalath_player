@@ -22,8 +22,6 @@ void free_game(Game* game);
 
 int init_position(Game* game, char* filename);
 
-Board* get_board(Game* game);
-
 int8_t get_id_of_move(Game* game, Coord coord);
 
 void make_move(Game* game, Coord coord, uint8_t current_id);

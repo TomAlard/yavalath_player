@@ -1,5 +1,6 @@
 #include "hexagon_grid.h"
 #include "board.h"
+#include "game.h"
 
 
 // https://www.redblobgames.com/grids/hexagons

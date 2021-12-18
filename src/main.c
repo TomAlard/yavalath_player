@@ -100,7 +100,7 @@ int play_best_move(Game* game, uint8_t my_id, Coord enemy_move, bool first, int 
 
 #define TIME 5
 int main() {
-    // run_tests();
+    run_tests();
     int my_id;
     scanf("%d", &my_id);
     Game* game = init_game();

@@ -8,8 +8,10 @@ void test_init_game() {
     for (int x = 0; x < BOARD_SIZE; x++) {
         for (int y = 0; y < BOARD_SIZE; y++) {
             Coord coord = {x, y};
-            int expected_id = coord_is_valid(coord)? 0 : -1;
-            my_assert(get_id_of_move(game, coord) == expected_id, "test_init_game: Incorrectly initialized id's");
+            if (coord_is_valid(coord)) {
+                my_assert(get_id_of_move(game, coord) == 0,
+                          "test_init_game: Incorrectly initialized id's");
+            }
         }
     }
     free_game(game);
@@ -82,7 +84,7 @@ void test_get_heuristic_value_of_game() {
     make_move(game, forces_two_moves, id);
     value = get_heuristic_value_of_game(game, forces_two_moves, 0);
     char* fail_msg2 = "test_get_heuristic_value_of_game: Heuristic value should be 1000";
-    my_assert(value == 1000, fail_msg2);
+    my_assert(value > DOUBLE_FORCING - 50 && value < DOUBLE_FORCING + 50, fail_msg2);
     free_game(game);
 }
 

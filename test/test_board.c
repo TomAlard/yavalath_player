@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test_board.h"
-#include "../src/board.h"
+#include "../src/game.h"
 #include "../src/util.h"
 
 
@@ -85,16 +85,20 @@ void test_calculate_true_value(Board* board) {
 }
 
 
-void validate_heuristic_values(Board* board, const Coord* moves, const int* expected_sign, char* fail_msg) {
+void validate_heuristic_values(Board* board, const Coord* moves, const int* expected_sign, Coord expected_forced_move) {
+    char* fail_msg = "test_calculate_heuristic_value: Incorrect heuristic value";
+    Coord forced_move = INVALID_COORD;
     for (int id = 1; id <= 2; id++) {
         for (int i = 0; i < 3; i++) {
             Coord move = moves[i];
             set_id(board, move, id);
-            int heuristic_value = calculate_heuristic_value(board, move);
+            int heuristic_value = calculate_heuristic_value(board, move, &forced_move);
             my_assert(sign(heuristic_value) == expected_sign[i], fail_msg);
         }
+        char* fail_forced_msg = "test_calculate_heuristic_value: Incorrect forced move";
+        my_assert(coord_equals(forced_move, expected_forced_move), fail_forced_msg);
         set_id(board, moves[1], 0);
-        int heuristic_value2 = calculate_heuristic_value(board, moves[2]);
+        int heuristic_value2 = calculate_heuristic_value(board, moves[2], &forced_move);
         my_assert(sign(heuristic_value2) == expected_sign[3], fail_msg);
         for (int i = 0; i < 4; i++) {
             set_id(board, moves[i], 0);
@@ -104,17 +108,19 @@ void validate_heuristic_values(Board* board, const Coord* moves, const int* expe
 
 
 void test_calculate_heuristic_value(Board* board) {
-    char* fail_msg = "test_calculate_heuristic_value: Incorrect heuristic value";
-    int expected_sign[] = {0, 1, 1, -1};
+    int expected_sign[] = {1, 1, 1, -1};
 
     Coord moves_horizontal[] = {{0, 0}, {0, 3}, {0, 2}};
-    validate_heuristic_values(board, moves_horizontal, expected_sign, fail_msg);
+    Coord expected_forced_move_horizontal = {0, 1};
+    validate_heuristic_values(board, moves_horizontal, expected_sign, expected_forced_move_horizontal);
 
     Coord moves_down_right[] = {{4, 5}, {7, 5}, {6, 5}};
-    validate_heuristic_values(board, moves_down_right, expected_sign, fail_msg);
+    Coord expected_forced_move_down_right = {5, 5};
+    validate_heuristic_values(board, moves_down_right, expected_sign, expected_forced_move_down_right);
 
     Coord moves_down_left[] = {{2, 3}, {5, 2}, {4, 3}};
-    validate_heuristic_values(board, moves_down_left, expected_sign, fail_msg);
+    Coord expected_forced_move_down_left = {3, 3};
+    validate_heuristic_values(board, moves_down_left, expected_sign, expected_forced_move_down_left);
 }
 
 
