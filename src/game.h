@@ -9,6 +9,7 @@
 #define BOARD_SQUARES 61
 #define WIN 10000
 #define LOSS -WIN
+#define UNDECIDED 0
 #define INF (WIN+1)
 
 typedef unsigned long long Hash;
